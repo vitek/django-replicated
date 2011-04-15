@@ -23,9 +23,10 @@ def using_slave():
     return getattr(_locals, 'use_slave', False)
 
 def get_slave_connection():
-    if not hasattr(_locals, 'current_slave'):
-        randomize_slave()
-    return django.db.connections[_locals.current_slave]
+    """Get slave connection if using_slave() is True."""
+    if using_slave():
+        return django.db.connections[current_slave()]
+    return django.db.connection
 
 
 class MasterSlaveRouter(object):

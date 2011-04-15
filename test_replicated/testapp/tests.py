@@ -32,5 +32,14 @@ class TestMasterSlave(TestCase):
 
     def test_slave_connection(self):
         import replicated.routers
+        replicated.routers.use_slave(True)
+        replicated.routers.randomize_slave()
         connection = replicated.routers.get_slave_connection()
         self.assertEqual(connection.alias, 'slave')
+
+    def test_slave_connection_noslave(self):
+        import replicated.routers
+        replicated.routers.use_slave(False)
+        replicated.routers.randomize_slave()
+        connection = replicated.routers.get_slave_connection()
+        self.assertEqual(connection.alias, 'default')
