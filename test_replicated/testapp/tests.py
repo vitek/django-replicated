@@ -25,3 +25,12 @@ class TestMasterSlave(TestCase):
     def test_post_use_master(self):
         response = self.client.post('/test_use_master')
         self.assertEqual(response.content, 'default')
+
+    def test_master_connection(self):
+        import django.db
+        self.assertEqual(django.db.connection.alias, 'default')
+
+    def test_slave_connection(self):
+        import replicated.routers
+        connection = replicated.routers.get_slave_connection()
+        self.assertEqual(connection.alias, 'slave')

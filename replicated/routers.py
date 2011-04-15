@@ -2,6 +2,7 @@ import random
 import threading
 
 from django.conf import settings
+import django.db
 
 DATABASE_SLAVES = [dbname for dbname in settings.DATABASES
                    if dbname.startswith('slave')] or ['default']
@@ -20,6 +21,11 @@ def use_slave(value):
 
 def using_slave():
     return getattr(_locals, 'use_slave', False)
+
+def get_slave_connection():
+    if not hasattr(_locals, 'current_slave'):
+        randomize_slave()
+    return django.db.connections[_locals.current_slave]
 
 
 class MasterSlaveRouter(object):
