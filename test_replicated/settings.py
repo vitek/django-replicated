@@ -26,7 +26,6 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'test_replicated.urls'
 
 INSTALLED_APPS = (
-    'django.contrib.contenttypes',
     'django.contrib.sessions',
     'replicated',
     'testapp',
