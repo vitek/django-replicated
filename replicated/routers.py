@@ -1,17 +1,31 @@
-import random
+from random import random
 import threading
 
 from django.conf import settings
 import django.db
 
-DATABASE_SLAVES = [dbname for dbname in settings.DATABASES
-                   if dbname.startswith('slave')] or ['default']
+DATABASE_SLAVES = []
+TOTAL_WEIGHT = 0
 ALWAYS_MASTER_MODELS = set()
+
+for dbname, params in settings.DATABASES.iteritems():
+    if not dbname.startswith('slave'):
+        continue
+    weight = params.get('WEIGHT', 1)
+    DATABASE_SLAVES.append((dbname, weight))
+    TOTAL_WEIGHT += weight
 
 _locals = threading.local()
 
 def randomize_slave():
-    _locals.current_slave = random.choice(DATABASE_SLAVES)
+    r = TOTAL_WEIGHT * random()
+    for dbname, weight in DATABASE_SLAVES:
+        if r > weight:
+            r -= weight
+        else:
+            _locals.current_slave = dbname
+            return
+    _locals.current_slave = 'default'
 
 def current_slave():
     return getattr(_locals, 'current_slave', 'default')
